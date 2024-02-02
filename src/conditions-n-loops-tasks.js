@@ -317,8 +317,89 @@ function getBalanceIndex(arr) {
  *          [10, 9,  8,  7]
  *        ]
  */
-function getSpiralMatrix(/* size */) {
-  throw new Error('Not implemented');
+function getSpiralMatrix(size) {
+  const res = [];
+  let clue = 'i';
+  let iTarget = 0;
+  let jTarget = 0;
+  let movesLeft = size;
+  let currentMoves = size;
+  let prevMoveIndex = size;
+  let reverseMode = true;
+  let reverseRuns = 0;
+
+  for (let i = 0; i < size; i += 1) {
+    res[i] = [];
+    for (let j = 0; j < size; j += 1) {
+      res[i][j] = '0';
+    }
+  }
+
+  function setNextTarget(i, j, k) {
+    if (k === size ** 2) return;
+
+    function toggleReverseMode() {
+      reverseMode = !reverseMode;
+      if (reverseMode) reverseRuns = 2;
+    }
+
+    function prepareNextMoves() {
+      if (reverseMode || i === j) {
+        reverseRuns -= 1;
+        if (reverseRuns < 1) {
+          toggleReverseMode();
+        }
+      }
+      if (prevMoveIndex === currentMoves) {
+        movesLeft = currentMoves - 1;
+        currentMoves = movesLeft;
+      } else {
+        movesLeft = currentMoves;
+        prevMoveIndex = currentMoves;
+      }
+    }
+
+    movesLeft -= 1;
+    if (i === j && i === 0) {
+      toggleReverseMode();
+    }
+
+    if (clue === 'i') {
+      if (movesLeft === 0) {
+        prepareNextMoves();
+        clue = 'j';
+        jTarget = j;
+        iTarget = reverseMode ? i - 1 : i + 1;
+      } else {
+        jTarget = reverseMode ? j - 1 : j + 1;
+      }
+    } else if (clue === 'j') {
+      if (movesLeft === 0) {
+        prepareNextMoves();
+        clue = 'i';
+        iTarget = i;
+        jTarget = reverseMode ? j - 1 : j + 1;
+      } else {
+        iTarget = reverseMode ? i - 1 : i + 1;
+      }
+    }
+  }
+
+  for (let k = 1; k <= size ** 2; k += 1) {
+    for (let i = 0; i < size; i += 1) {
+      let exitLoop = false;
+      for (let j = 0; j < size; j += 1) {
+        if (iTarget === i && jTarget === j) {
+          res[i][j] = k;
+          setNextTarget(i, j, k);
+          exitLoop = true;
+          break;
+        }
+      }
+      if (exitLoop) break;
+    }
+  }
+  return res;
 }
 
 /**
